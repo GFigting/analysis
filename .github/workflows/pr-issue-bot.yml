@@ -1,0 +1,52 @@
+name: PR & Issue Bot
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened, closed, synchronize]
+
+jobs:
+  issue-welcome:
+    name: Welcome New Issue
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    steps:
+      - name: Comment on Issue
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const issueComment = context.issue({
+              body: '感谢您的反馈！我们很快会查看并处理这个问题。'
+            });
+            github.issues.createComment(issueComment);
+
+  pr-actions:
+    name: PR Actions
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Tests
+        run: |
+          # 这里添加运行测试的命令，例如：
+          npm install
+          npm test
+
+      - name: Format Check
+        if: github.event.action != 'closed'
+        run: |
+          # 添加代码格式检查命令，例如：
+          npm run lint
+
+      - name: Merge and Notify
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const prComment = context.issue({
+              body: 'PR已成功合并！感谢您的贡献！'
+            });
+            github.issues.createComment(prComment);
