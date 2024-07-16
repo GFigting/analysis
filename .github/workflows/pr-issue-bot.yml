@@ -6,6 +6,11 @@ on:
   pull_request:
     types: [opened, closed, synchronize]
 
+env:
+  ISSUE_COMMENT: "感谢您的反馈！我们很快会查看并处理这个问题。"
+  PR_OPENED_COMMENT: "感谢您提交的Pull Request！我们会尽快审查您的贡献。"
+  PR_CLOSED_COMMENT: "感谢您的贡献！此Pull Request已关闭。"
+
 jobs:
   issue-welcome:
     name: Welcome New Issue
@@ -13,10 +18,10 @@ jobs:
     if: github.event_name == 'issues' && github.event.action == 'opened'
     steps:
       - name: Comment on Issue
-        uses: actions/github-script@v7.0.1
+        uses: actions/github-script@latest
         with:
           script: |
-            const commentBody = '感谢您的反馈！我们很快会查看并处理这个问题。';
+            const commentBody = process.env.ISSUE_COMMENT;
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -24,32 +29,40 @@ jobs:
               body: commentBody
             });
 
-  pr-actions:
-    name: PR Actions
+  pr-welcome:
+    name: Welcome New Pull Request
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Comment on PR Opened
+        uses: actions/github-script@latest
+        with:
+          script: |
+            const commentBody = process.env.PR_OPENED_COMMENT;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
 
-      # - name: Run Tests
-      #   run: |
-      #     # 这里添加运行测试的命令，例如：
-      #     npm install
-      #     npm test
-
-      # - name: Format Check
-      #   if: github.event.action != 'closed'
-      #   run: |
-      #     # 添加代码格式检查命令，例如：
-      #     npm run lint
-
-      # - name: Merge and Notify
-      #   if: github.event.action == 'closed' && github.event.pull_request.merged == true
-      #   uses: actions/github-script@v5
-      #   with:
-      #     script: |
-      #       const prComment = context.issue({
-      #         body: 'PR已成功合并！感谢您的贡献！'
-      #       });
-      #       github.issues.createComment(prComment);
+  pr-closed-feedback:
+    name: Feedback on PR Closed
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    steps:
+      - name: Check PR Merge Status
+        id: check_merge
+        run: echo "::set-output name=merged::$([[ ${{ github.event.pull_request.merged }} == true ]] && echo 'true' || echo 'false')"
+      - name: Comment on PR Closed
+        if: steps.check_merge.outputs.merged == 'true'
+        uses: actions/github-script@latest
+        with:
+          script: |
+            const commentBody = process.env.PR_CLOSED_COMMENT;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
