@@ -13,13 +13,16 @@ jobs:
     if: github.event_name == 'issues' && github.event.action == 'opened'
     steps:
       - name: Comment on Issue
-        uses: actions/github-script@v5
+        uses: actions/github-script@v7.0.1
         with:
           script: |
-            const issueComment = context.issue({
-              body: '感谢您的反馈！我们很快会查看并处理这个问题。'
+            const commentBody = '感谢您的反馈！我们很快会查看并处理这个问题。';
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
             });
-            github.issues.createComment(issueComment);
 
   pr-actions:
     name: PR Actions
@@ -29,17 +32,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Run Tests
-        run: |
-          # 这里添加运行测试的命令，例如：
-          npm install
-          npm test
+      # - name: Run Tests
+      #   run: |
+      #     # 这里添加运行测试的命令，例如：
+      #     npm install
+      #     npm test
 
-      - name: Format Check
-        if: github.event.action != 'closed'
-        run: |
-          # 添加代码格式检查命令，例如：
-          npm run lint
+      # - name: Format Check
+      #   if: github.event.action != 'closed'
+      #   run: |
+      #     # 添加代码格式检查命令，例如：
+      #     npm run lint
 
       - name: Merge and Notify
         if: github.event.action == 'closed' && github.event.pull_request.merged == true
