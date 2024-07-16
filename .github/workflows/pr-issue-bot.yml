@@ -44,12 +44,12 @@ jobs:
       #     # 添加代码格式检查命令，例如：
       #     npm run lint
 
-      - name: Merge and Notify
-        if: github.event.action == 'closed' && github.event.pull_request.merged == true
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const prComment = context.issue({
-              body: 'PR已成功合并！感谢您的贡献！'
-            });
-            github.issues.createComment(prComment);
+      # - name: Merge and Notify
+      #   if: github.event.action == 'closed' && github.event.pull_request.merged == true
+      #   uses: actions/github-script@v5
+      #   with:
+      #     script: |
+      #       const prComment = context.issue({
+      #         body: 'PR已成功合并！感谢您的贡献！'
+      #       });
+      #       github.issues.createComment(prComment);
