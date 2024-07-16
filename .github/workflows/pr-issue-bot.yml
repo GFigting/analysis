@@ -18,7 +18,7 @@ jobs:
     if: github.event_name == 'issues' && github.event.action == 'opened'
     steps:
       - name: Comment on Issue
-        uses: actions/github-script@7
+        uses: actions/github-script@v7
         with:
           script: |
             const commentBody = process.env.ISSUE_COMMENT;
@@ -35,7 +35,7 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.action == 'opened'
     steps:
       - name: Comment on PR Opened
-        uses: actions/github-script@latest
+        uses: actions/github-script@v7
         with:
           script: |
             const commentBody = process.env.PR_OPENED_COMMENT;
@@ -56,7 +56,7 @@ jobs:
         run: echo "::set-output name=merged::$([[ ${{ github.event.pull_request.merged }} == true ]] && echo 'true' || echo 'false')"
       - name: Comment on PR Closed
         if: steps.check_merge.outputs.merged == 'true'
-        uses: actions/github-script@latest
+        uses: actions/github-script@v7
         with:
           script: |
             const commentBody = process.env.PR_CLOSED_COMMENT;
