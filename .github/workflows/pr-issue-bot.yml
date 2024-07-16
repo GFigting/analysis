@@ -18,7 +18,7 @@ jobs:
     if: github.event_name == 'issues' && github.event.action == 'opened'
     steps:
       - name: Comment on Issue
-        uses: actions/github-script@latest
+        uses: actions/github-script@7
         with:
           script: |
             const commentBody = process.env.ISSUE_COMMENT;
