@@ -22,7 +22,7 @@ jobs:
         with:
           script: |
             const commentBody = process.env.ISSUE_COMMENT;
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -39,7 +39,7 @@ jobs:
         with:
           script: |
             const commentBody = process.env.PR_OPENED_COMMENT;
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -60,7 +60,7 @@ jobs:
         with:
           script: |
             const commentBody = process.env.PR_CLOSED_COMMENT;
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
